@@ -1,0 +1,432 @@
+/* CSS by Pengcheng Zhang */
+
+/* mod2 note 
+Refactoring evidence:
+1.Buttons 
+.btn, .button, and button redundantly define the same styles.
+Now,.btn, .button, and button share the same rule.
+
+2. Media
+media-image and .media-video share display and sizing styles.
+
+3.Print colors 
+body, .card, .media, and .site-footer share a single property.
+
+4.Print visibility
+.nav, .button share display and sizing styles.
+
+5.Replace repeated values with custom properties
+Colors , Typography, Spacing, Shape, Focus  */
+ 
+
+/*  Architecture notes:
+The CSS architecture employs a design structure comprising reset, tokens, base, layout, 
+components, utilities, states, and overrides.
+
+Token Decisions
+Global variables in :root define reusable colors, fonts,
+spacing, border width, and focus color.
+Card-specific variables are defined inside .card.
+
+Naming convention: 
+Based on the gpt6,1 naming standard. The rule is: Function-Variable-Value.
+
+*/
+
+
+
+
+/*  Deliverable: Responsive Layout Systems Build  mod3 note 10/22/2026
+
+Based on Module 2 CSS
+
+layout notes
+1. The main container utilizes max-inline-size, margin-inline, and padding defined via the clamp() function.
+
+2.The .card-grid employs a combination of auto-fit and minmax() to automatically adjust the number of columns. 
+The .resources section uses minmax() to define its grid tracks, 
+causing the layout to shift from a single column to two columns once the width reaches 42rem.
+
+3. "Subgrid" is not required here, as the content within each card is independent and does not necessitate alignment across internal rows.
+
+4. Each .card is designated as a container for "container queries.
+" By default, the .butto` inside each card fills the available width; however, 
+once the container's width reaches 280px, the button's width switches to auto.
+
+6. When prefers-contrast: more is detected (indicating a user preference for higher contrast), the system increases the contrast for text and borders, 
+and adds underlines to navigation links.
+
+7. For browsers that do not support container queries, a combination of default styles and an @supports
+fallback mechanism ensures that the buttons within the cards consistently remain full-width.
+
+*/
+
+/* Artificial Intelligence Disclosure 
+Since the new HTML and color scheme for the home page are being used, GPT helped replace the color properties in the original CSS.
+
+In the "User preferences" section, I ve implemented a suggestion from GPT to detect whether the user has enabled high-contrast settings in their operating system or browser.
+I also applied the recommended `overflow-wrap: anywhere` to prevent text from expanding beyond its container.
+
+Testing evidence: Please refer to the Word document.
+
+*/
+
+
+
+
+
+
+
+/*  imports Fonts.*/
+
+@layer reset, tokens, base, layout, components, utilities, states, overrides;
+
+
+/* CSS Reset / 重置 */
+
+@layer reset {
+ 
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+  }
+}
+
+
+
+
+
+
+/* Root  / 全局设计变量 */
+
+@layer tokens {
+  :root {
+    /* Colors  */
+    --header-bg: #090b0b;
+    --yellow: #d6e000;
+    --dark-gray: #242929;
+    --black: #101313;
+    --white: #e4e6e7;
+    --light-gray: #303434;
+    --off-white: #1c2020;
+    --media-bg: #242929;
+    --border-color: #626b6b;
+
+    /* Typography  */
+     --font-body: Arial, Helvetica, sans-serif;
+
+    /* Spacing  */
+    --test-Spacing-1: 0.25rem;
+    --test-Spacing-2: 0.5rem;
+    --test-Spacing-3: 0.75rem;
+
+
+    /* Shape */
+   --test-Shape-1: 1.5px;
+
+
+    /* Focus  */
+    --focus-color: var(--yellow);
+
+    
+  }
+}
+
+
+/* Global Styles Mobile First*/
+
+/* Base / 基础样式 */
+
+@layer base {
+    body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  a { 
+    color: var(--yellow); 
+  }
+}
+
+
+/* Layout  */
+
+@layer layout {
+    main {
+    max-inline-size: 1100px;
+    margin-inline: auto;
+    padding-block: clamp(1rem, 4vw, 2rem);
+    padding-inline: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 20px;
+    margin-block: 32px;
+  }
+  
+  .section {
+    margin-block-end: 48px;
+  }
+
+  .resources {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .card-grid > *, 
+  .resources > * { 
+    min-inline-size: 0; 
+  }
+
+
+  @media (min-width: 42rem) {
+    .resources {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+
+
+}
+
+
+
+/* Components / 组件 */
+
+@layer components {
+
+/* Header */
+header {
+  background: var(--header-bg);
+  color:var(--white);
+  padding: 24px;
+}
+
+.site-header {
+  background: var(--header-bg);
+  padding: 24px;
+}
+
+.site-header a {
+  color: var(--white);
+  text-decoration: none;
+}
+
+  /* Navigation  */
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--test-Spacing-2);
+    background-color: var(--light-gray);
+  }
+
+  .nav-link {
+    color: var(--white);
+    text-decoration: none;
+    display: inline-block;
+    padding: var(--test-Spacing-2) var(--test-Spacing-3);
+  }
+
+  /* card */
+
+  .card {
+     --card-bg: var(--off-white);
+     --card-border-color: var(--border-color);
+     --card-padding: 1rem;
+      background-color: var(--card-bg);
+      padding: var(--card-padding);
+      border: var(--test-Shape-1) solid var(--card-border-color);
+      container-type: inline-size;
+      container-name: card;
+ }
+
+
+
+  /* Button  */
+  .btn,
+  .button,
+   button {
+    background-color: var(--yellow);
+    color: var(--black);
+    padding: var(--test-Spacing-2) var(--test-Spacing-3);
+    border: none;
+    font-family: var(--font-body);
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  /*  Media block / */
+
+  .media {
+    margin: 0;
+    min-inline-size: 0;
+    padding: var(--test-Spacing-2);
+    background-color: var(--media-bg);
+  }
+
+  .media-image,
+  .media-video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+
+  .media-video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+
+  .card .button { 
+    inline-size: 100%; 
+    text-align: center; 
+  }
+
+
+  @container card (min-width: 280px) {
+    .card .button { 
+      inline-size: auto; 
+    }
+  }
+
+ 
+  @supports not (container-type: inline-size) {
+    .card .button { 
+      inline-size: 100%; 
+    }
+  }
+
+  /*Footer */
+
+  .site-footer {
+    background-color: var(--dark-gray);
+    color: var(--white);
+    padding: var(--test-Spacing-3);
+    text-align: center;
+  }
+}
+
+
+/* Utilities / 工具类 */
+
+@layer utilities {
+
+  .text-center {
+    text-align: center;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+    
+  .space-bottom {
+    margin-block-end: var(--test-Spacing-3);
+  }
+}
+
+
+/* States / 状态 */
+
+@layer states {
+  /* Hover  */
+
+  .nav-link:hover {
+    background-color: var(--yellow);
+    color: var(--black);
+  }
+
+  .button:hover {
+    background-color: var(--white);
+    color: var(--black)
+  }
+
+  .button:active {
+    background-color: var(--black);
+    color: var(--white);
+}
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* Keyboard focus  */
+
+  :focus-visible {
+    outline: 3px solid var(--focus-color);
+    outline-offset: 3px;
+  }
+
+
+  .nav-link[aria-current="page"] {
+    background-color: var(--yellow);
+    color: var(--black);
+    text-decoration: underline;
+    
+  }
+
+}
+
+
+/* Overrides / 覆盖 */
+
+@layer overrides {
+  @media (prefers-contrast: more) {
+    :root {
+      --border-color: #ffffff;
+      --white: #ffffff;
+    }
+    .nav-link { text-decoration: underline; }
+  }
+}
+
+
+
+
+@media print {
+  @layer overrides {
+    body,
+    .site-header,
+    .card,
+    .media,
+    .site-footer {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+
+    .nav,
+    .btn,
+    button,
+    .button {
+      display: none;
+    }
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
